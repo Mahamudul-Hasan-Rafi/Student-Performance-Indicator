@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 
 def get_requirements(file):
     with open(file) as f:
-        requirements = f.readlines()
+        requirements = f.readlines() 
         requirements = [req.replace("/n", "") for req in requirements]
 
         if "-e ." in requirements:
