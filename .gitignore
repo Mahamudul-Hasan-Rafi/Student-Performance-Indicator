@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+#catboost
+catboost_info
+notebook/catboost_info
+
 # Distribution / packaging
 .Python
 /artifacts
@@ -78,6 +82,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+
 
 # IPython
 profile_default/
