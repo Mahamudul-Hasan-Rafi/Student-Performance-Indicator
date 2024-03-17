@@ -55,16 +55,59 @@ class ModelTrainer:
                 "XGBoost": XGBRegressor(),
                 "AdaBoost": AdaBoostRegressor(),
             }
-            
-            model_report: dict=evaluate_model(models, X_train, y_train, X_test, y_test)
 
-            best_model_score = max(sorted(model_report.values()))
+            params={
+                "LinearRegression":{},
+                "Lasso":{
+                    "alpha":[0.2,0.3,0.5,0.7,0.8,1.0],
+                    "tol":[1e-3,1e-4],
+                    "selection":['random','cyclic']
+                },
+                "Ridge":{
+                    "alpha":[0.2,0.3,0.5,0.7,0.8,1.0],
+                    "tol":[1e-3,1e-4]
+                },
+                "Decision Tree":{
+                    'criterion':['squared_error', 'friedman_mse', 'absolute_error', 'poisson']
+                },
+                "K Nearest Neighbors":{
+                    "n_neighbors":[3,5,7,9]
+                },
+                "Support Vector":{
+                    "tol":[1e-3,1e-4]
+                },
+                "Random Forest":{
+                    "n_estimators":[8,16,32,64,100,128],
+                    "criterion":["squared_error","absolute_error","friedman_mse","poisson"]
+                },
+                "Gradient Boosting":{
+                    'learning_rate':[.1,.01,.05,.001],
+                    'subsample':[0.6,0.7,0.75,0.8,0.85,0.9],
+                    'n_estimators': [8,16,32,64,128,256]
+                },
+                "Cat Boost":{
+                    'learning_rate': [0.01, 0.05, 0.1],
+                    'iterations': [50, 100, 500, 1000]
+                },
+                "XGBoost":{
+                    'learning_rate':[.1,.01,.05,.001],
+                    'n_estimators': [8,16,32,64,128,256]
+                },
+                "AdaBoost":{
+                    "n_estimators":[8,16,32,50,64,128,256],
+                    "learning_rate":[0.5,0.1,0.01,0.001,0.005]
+                }
+            }
+            
+            model_report: dict=evaluate_model(models, params, X_train, y_train, X_test, y_test)
+
+            best_model_score = max(list(model_report.values()), key=lambda x:x['Test Score'])
 
             best_model_name = list(model_report.keys())[list(model_report.values()).index(best_model_score)]
 
             best_model=models[best_model_name]
 
-            if best_model_score<0.6:
+            if best_model_score['Test Score']<0.6:
                 raise CustomException("No Best model found")
             
             logging.info("Best model found on train and test data")
@@ -76,8 +119,10 @@ class ModelTrainer:
             
             predicted=best_model.predict(X_test)
             r2_square=r2_score(y_test,predicted)
+            
+            print(best_model_score)
 
-            return {'Model': best_model_name,'R2 Score': r2_square}
+            return {'Model': best_model_name,'R2 Score': r2_square, 'Model Report':model_report[best_model_name]}
         
         except Exception as e:
             raise CustomException(e,sys)
