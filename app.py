@@ -35,4 +35,4 @@ def predict_score(request: Request, gender: str=Form(...), ethnicity: str=Form(.
     prediction=Prediction()
     result=prediction.predict_score(features)
 
-    return templates.TemplateResponse("index.html",{"request":request, "results":result})
+    return templates.TemplateResponse("index.html",{"request":request, "results":result[0]})
